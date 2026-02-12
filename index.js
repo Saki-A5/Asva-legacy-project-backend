@@ -4,14 +4,14 @@ import dotenv from "dotenv";
 import cors from "cors";
 
 dotenv.config();
-dbConn();
+// dbConn();
 
-import route from "./api/routes/index.js";
+// import route from "./api/routes/index.js";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(route);
+// app.use(route);
 
 app.get("/", (req, res) => {
     res.send("welcome, thanks for considering us");
