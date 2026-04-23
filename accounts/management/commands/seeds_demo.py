@@ -8,6 +8,8 @@ class Command(BaseCommand):
                 username="demo",
                 email="demo@gmail.com",
                 password="demo1234"
+                #is_staff = True,
+                #is_superuser = True,
             )
             self.stdout.write(self.style.SUCCESS("Demo user created"))
         else:
