@@ -2,9 +2,12 @@ from django.contrib.auth import get_user_model
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenObtainPairView
+
 
 from .models import UserProfile
 from .serializers import ReferenceSerializer, RegisterSerializer
+from .serializers import EmailOrUsernameTokenSerializer
 
 
 User = get_user_model()
@@ -53,3 +56,5 @@ class ReferenceView(APIView):
         serializer = ReferenceSerializer({"reference_code": profile.reference_code})
         return Response(serializer.data)
 
+class EmailOrUsernameTokenView(TokenObtainPairView):
+    serializer_class = EmailOrUsernameTokenSerializer

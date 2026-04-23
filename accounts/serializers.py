@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from .models import UserProfile
 from .utils import generate_reference_code
-
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 User = get_user_model()
 
@@ -31,3 +31,15 @@ class RegisterSerializer(serializers.ModelSerializer):
 class ReferenceSerializer(serializers.Serializer):
     reference_code = serializers.CharField(read_only=True)
 
+class EmailOrUsernameTokenSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        
+        login_input = attrs.get('username')
+        if '@' in login_input:
+            try:
+                user = User.objects.get(email=login_input)
+                attrs['username'] = user.username
+            except User.DoesNotExist:
+                pass
+        return super().validate(attrs)
+         
