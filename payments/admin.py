@@ -15,6 +15,12 @@ class PaymentClaimAdmin(admin.ModelAdmin):
         for claim in queryset:
             claim.status = PaymentClaim.Status.CONFIRMED
             claim.save(update_fields=["status", "updated_at"])
+
+            # activate the user's account
+            user = claim.user
+            user.is_active = True
+            user.save(update_fields=["is_active"])
+
             AdminNotification.objects.create(
                 type=AdminNotification.Type.PAYMENT_CONFIRMED,
                 reference_code=claim.reference_code,
@@ -38,4 +44,3 @@ class AdminNotificationAdmin(admin.ModelAdmin):
     list_display = ("id", "type", "reference_code", "claim", "is_read", "created_at")
     list_filter = ("type", "is_read", "created_at")
     search_fields = ("reference_code",)
-

@@ -43,6 +43,12 @@ class AdminConfirmPaymentView(APIView):
         claim = get_object_or_404(PaymentClaim, pk=pk)
         claim.status = PaymentClaim.Status.CONFIRMED
         claim.save(update_fields=["status", "updated_at"])
+
+        # activate the user's account
+        user = claim.user
+        user.is_active = True
+        user.save(update_fields=["is_active"])
+
         AdminNotification.objects.create(
             type=AdminNotification.Type.PAYMENT_CONFIRMED,
             reference_code=claim.reference_code,
@@ -86,4 +92,3 @@ class AdminNotificationReadView(APIView):
         notification.is_read = True
         notification.save(update_fields=["is_read"])
         return Response(status=status.HTTP_200_OK)
-
