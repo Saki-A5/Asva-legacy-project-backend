@@ -3,19 +3,16 @@ from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
-
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import UserProfile
-from .serializers import ReferenceSerializer, RegisterSerializer
-from .serializers import EmailOrUsernameTokenSerializer
+from .serializers import ReferenceSerializer, RegisterSerializer, EmailOrUsernameTokenSerializer
 
 
 User = get_user_model()
 
 
 class AuthApiRootView(APIView):
-    """GET /api/auth/ — lists auth routes (no trailing resource at this path otherwise 404)."""
-
     permission_classes = [permissions.AllowAny]
 
     def get(self, request, *args, **kwargs):
@@ -24,6 +21,9 @@ class AuthApiRootView(APIView):
                 "detail": "ASVA auth API",
                 "endpoints": {
                     "register": {"method": "POST", "url": "/api/auth/register"},
+                    "login": {"method": "POST", "url": "/api/auth/login"},
+                    "logout": {"method": "POST", "url": "/api/auth/logout"},
+                    "token_refresh": {"method": "POST", "url": "/api/auth/token/refresh"},
                 },
             }
         )
@@ -56,5 +56,31 @@ class ReferenceView(APIView):
         serializer = ReferenceSerializer({"reference_code": profile.reference_code})
         return Response(serializer.data)
 
+
 class EmailOrUsernameTokenView(TokenObtainPairView):
     serializer_class = EmailOrUsernameTokenSerializer
+
+
+class LogoutView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        refresh_token = request.data.get("refresh")
+        if not refresh_token:
+            return Response(
+                {"detail": "Refresh token required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        try:
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+        except Exception:
+            return Response(
+                {"detail": "Invalid or expired token."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return Response(
+            {"detail": "Logged out successfully."},
+            status=status.HTTP_205_RESET_CONTENT
+        )
