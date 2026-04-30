@@ -9,7 +9,7 @@ from .serializers import AdminNotificationSerializer, PaymentClaimCreateSerializ
 
 class CreatePaymentClaimView(generics.CreateAPIView):
     serializer_class = PaymentClaimCreateSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]  
 
     def perform_create(self, serializer):
         claim = serializer.save()

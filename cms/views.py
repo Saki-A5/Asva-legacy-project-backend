@@ -21,7 +21,7 @@ class PublicContentView(generics.RetrieveAPIView):
 
 class EventListView(generics.ListAPIView):
     serializer_class = EventSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def get_queryset(self):
         # only return events that haven't passed yet
